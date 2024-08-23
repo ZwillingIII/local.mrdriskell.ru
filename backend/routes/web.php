@@ -7,6 +7,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/test', function () {
-    return ['test success'];
-});
+//Route::post('/test', function () {
+//    return ['test success'];
+//});

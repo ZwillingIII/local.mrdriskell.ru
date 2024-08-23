@@ -1,43 +1,41 @@
-# Используем официальный образ PHP с FPM
 FROM php:8.3-fpm
 
-# Установка системных зависимостей
+# Arguments defined in docker-compose.yml
+ARG user
+ARG uid
+
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
+    git \
+    curl \
+    libicu-dev \
     libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
     libonig-dev \
     libxml2-dev \
     zip \
     unzip \
-    git \
-    curl
+    libpq-dev \
+    libzip-dev
 
-# Установка расширений PHP
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Установка Composer
+RUN #pecl install mongodb
+
+RUN #echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/mongo.ini
+# Install PHP extensions
+RUN docker-php-ext-install mbstring exif pcntl bcmath gd pdo pdo_pgsql zip intl
+
+RUN echo 'memory_limit = 1024M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini;
+# Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Создание рабочей директории
+# Create system user to run Composer and Artisan Commands
+RUN useradd -G www-data,root -u $uid -d /home/$user $user
+RUN mkdir -p /home/$user/.composer && \
+    chown -R $user:$user /home/$user
+
+# Set working directory
 WORKDIR /var/www
 
-# Копирование файлов проекта
-COPY . .
-
-# Установка зависимостей проекта
-RUN composer install
-
-# Копирование файла конфигурации PHP
-#COPY php.ini /usr/local/etc/php/
-COPY ./php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
-
-# Настройка прав доступа
-RUN chown -R www-data:www-data /var/www
-
-# Экспонирование порта
-EXPOSE 9000
-
-# Запуск PHP-FPM
-CMD ["php-fpm"]
+#USER $user

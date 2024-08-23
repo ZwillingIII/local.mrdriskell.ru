@@ -9,7 +9,9 @@ export default Vue.extend({
   name: 'IndexPage',
   methods: {
     test() {
-      fetch('/api/test')
+      fetch('http://localhost/back', {
+        method: 'POST'
+      })
         .then(response => console.log(response));
     }
   }

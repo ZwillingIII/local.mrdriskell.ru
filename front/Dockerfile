@@ -13,7 +13,7 @@ RUN yarn install
 RUN chown -R www-data:www-data /usr/src/app
 
 # Экспонирование порта
-EXPOSE 3000
+#EXPOSE 3000
 
 # Запуск Nuxt.js
 CMD ["yarn", "dev"]
