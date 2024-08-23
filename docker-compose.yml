@@ -1,0 +1,53 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    container_name: ${APP_NAME}-backend
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/var/
+    networks:
+      - mrdriskell-network
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./front
+      dockerfile: ./Dockerfile
+    container_name: ${APP_NAME}-frontend
+    volumes:
+      - ./front:/usr/src/app
+    networks:
+      - mrdriskell-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: ${APP_NAME}-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - mrdriskell-network
+
+  db:
+    image: mariadb:10.6.17-focal
+    container_name: ${APP_NAME}-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./docker/mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - mrdriskell-network
+
+networks:
+  mrdriskell-network:
+    driver: bridge
