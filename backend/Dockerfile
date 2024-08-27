@@ -1,41 +1,49 @@
-FROM php:8.3-fpm
+FROM php:8.2-fpm
 
-# Arguments defined in docker-compose.yml
-ARG user
-ARG uid
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libicu-dev \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    libpq-dev \
-    libzip-dev
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-RUN #pecl install mongodb
-
-RUN #echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/mongo.ini
-# Install PHP extensions
-RUN docker-php-ext-install mbstring exif pcntl bcmath gd pdo pdo_pgsql zip intl
-
-RUN echo 'memory_limit = 1024M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini;
-# Get latest Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Create system user to run Composer and Artisan Commands
-RUN useradd -G www-data,root -u $uid -d /home/$user $user
-RUN mkdir -p /home/$user/.composer && \
-    chown -R $user:$user /home/$user
-
-# Set working directory
+# Устанавливаем рабочую директорию
 WORKDIR /var/www
 
-#USER $user
+# Копируем composer.lock и composer.json
+COPY composer.lock composer.json /var/www/
+
+# Устанавливаем зависимости
+RUN apt-get update && apt-get install -y \
+                              build-essential \
+                              libpng-dev \
+                              libjpeg62-turbo-dev \
+                              libfreetype6-dev \
+                              locales \
+                              zip \
+                              jpegoptim optipng pngquant gifsicle \
+                              vim \
+                              unzip \
+                              git \
+                              curl \
+                              libpq-dev \
+                              libonig-dev \
+                              libzip-dev
+
+# Очищаем кэш
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Устанавливаем расширения PHP
+RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl
+
+# Загружаем актуальную версию Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Создаём пользователя и группу www для приложения Laravel
+RUN groupadd -g 1000 www
+RUN useradd -u 1000 -ms /bin/bash -g www www
+
+# Копируем содержимое текущего каталога в рабочую директорию
+COPY . /var/www
+COPY --chown=www:www . /var/www
+
+# Меняем пользователя на www
+USER www
+
+# В контейнере открываем 9000 порт и запускаем сервер php-fpm
+EXPOSE 9000
+
+CMD ["php-fpm"]
