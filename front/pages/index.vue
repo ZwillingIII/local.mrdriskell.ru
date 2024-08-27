@@ -1,35 +1,18 @@
-<template lang="pug">
-  div
-    button(@click="test") {{ btnTxt }}
-    div(v-if="errorTxt.length") {{ errorTxt }}
+<script setup lang="ts">
+useHead({
+  title: 'My App',
+  meta: [
+    { name: 'description', content: 'My amazing site.' }
+  ],
+});
+</script>
+
+<template>
+<div>
+  <NuxtLink to="/catalog">Каталог</NuxtLink>
+</div>
 </template>
 
-<script>
-import Vue from 'vue';
-import axios from "axios";
+<style scoped lang="scss">
 
-export default Vue.extend({
-  name: 'IndexPage',
-  data() {
-    return {
-      btnTxt: 'Test',
-      errorTxt: ''
-    }
-  },
-  methods: {
-    test() {
-      let data = this;
-
-      data.errorTxt = '';
-
-      axios.post('http://localhost/api/test')
-        .then(function (response) {
-          data.btnTxt = response.data[0];
-        })
-        .catch(function (error) {
-          data.errorTxt = error.message;
-        })
-    }
-  }
-})
-</script>
+</style>
