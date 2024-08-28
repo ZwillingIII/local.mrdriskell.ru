@@ -44,7 +44,7 @@ const cartPrice = ref('38 000')
 
 <style scoped lang="scss">
 .header-desktop__top {
-  padding: 34px 0;
+  padding: 34px 0 20px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
