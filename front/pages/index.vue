@@ -8,9 +8,9 @@ useHead({
 </script>
 
 <template>
-<div>
-  <NuxtLink to="/catalog">Каталог</NuxtLink>
-</div>
+  <div>
+    jflsdfjsd;
+  </div>
 </template>
 
 <style scoped lang="scss">
