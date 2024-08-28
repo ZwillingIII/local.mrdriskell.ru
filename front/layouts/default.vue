@@ -29,4 +29,11 @@ body {
   font-family: 'Jost', sans-serif;
   color: #faf6f2;
 }
+
+a {
+  transition: all .3s;
+  &:hover {
+    color: #bb8c5f;
+  }
+}
 </style>

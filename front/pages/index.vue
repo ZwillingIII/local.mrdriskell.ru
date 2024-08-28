@@ -1,6 +1,6 @@
 <script setup lang="ts">
 useHead({
-  title: 'My App',
+  title: 'Mr. Driskell',
   meta: [
     { name: 'description', content: 'My amazing site.' }
   ],
